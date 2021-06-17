@@ -41,6 +41,8 @@ public class MainActivity extends AppCompatActivity {
         edtValue = findViewById(R.id.edt_value);
         activity = this;
 
+//        savePath = getApplicationContext().getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES).getAbsolutePath();
+
         findViewById(R.id.generate_barcode).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -76,17 +78,19 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.save_barcode).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                if (Image2GalleryUtil.hasExternalWritePermission(MainActivity.this)) {
                     try {
-                        boolean save = new QRGSaver().save(savePath, edtValue.getText().toString().trim(), bitmap, QRGContents.ImageType.IMAGE_JPEG);
-                        String result = save ? "Image Saved" : "Image Not Saved";
-                        Toast.makeText(activity, result, Toast.LENGTH_LONG).show();
+//                        boolean save = new QRGSaver().save(getApplicationContext(), savePath, edtValue.getText().toString().trim(), bitmap, QRGContents.ImageType.IMAGE_JPEG);
+//                        String result = save ? "Image Saved" : "Image Not Saved";
+
+                        Image2GalleryUtil.saveImage(bitmap, getApplicationContext(), "qrcode", Image2GalleryUtil.IMAGE_WEBP);
+                        Toast.makeText(activity, "Saved", Toast.LENGTH_LONG).show();
                         edtValue.setText(null);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 } else {
-                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+                    Image2GalleryUtil.requestWritePermission(MainActivity.this);
                 }
             }
         });

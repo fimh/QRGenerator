@@ -1,6 +1,10 @@
 package androidmads.library.qrgenearator;
 
+import android.app.Application;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.util.Log;
 
 import java.io.File;
@@ -10,7 +14,7 @@ import java.io.IOException;
 @SuppressWarnings("ALL")
 public class QRGSaver {
 
-    public boolean save(String saveLocation, String imageName, Bitmap bitmap, int imageFormat) {
+    public boolean save(Context app, String saveLocation, String imageName, Bitmap bitmap, int imageFormat) {
 
         boolean success = false;
         String imageDetail = saveLocation + imageName + imgFormat(imageFormat);
@@ -31,11 +35,19 @@ public class QRGSaver {
             Log.d("QRGSaver", e.toString());
         }
 
+        MediaScannerConnection.scanFile(app, new String[]{file.toString()}, null,
+                new MediaScannerConnection.OnScanCompletedListener() {
+                    public void onScanCompleted(String path, Uri uri) {
+                        Log.i("ExternalStorage", "Scanned " + path + ":");
+                        Log.i("ExternalStorage", "-> uri=" + uri);
+                    }
+                });
+
         return success;
     }
 
-    public boolean save(String saveLocation, String imageName, Bitmap bitmap) {
-        return save(saveLocation, imageName, bitmap, QRGContents.ImageType.IMAGE_PNG);
+    public boolean save(Context app, String saveLocation, String imageName, Bitmap bitmap) {
+        return save(app, saveLocation, imageName, bitmap, QRGContents.ImageType.IMAGE_PNG);
     }
 
     private String imgFormat(int imageFormat) {
